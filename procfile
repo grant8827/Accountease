@@ -1,1 +1,2 @@
-web: gunicorn accounts_easy_project.wsgi:application --bind 0.0.0.0:$PORT
+web: gunicorn accounts_easy_project.wsgi --log-file
+web: python manage.py migrate && gunicorn accounts_easy_project.wsg

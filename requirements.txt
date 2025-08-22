@@ -1,9 +1,8 @@
 asgiref
 Django
-psycopg2-binary
-python-decouple
-python-dotenv
+django-environ
 gunicorn
+psycopg2-binary
 whitenoise
 django-dotenv
 
