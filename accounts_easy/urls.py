@@ -1,9 +1,11 @@
 from django.urls import path
 from . import views
+from .test_views import simple_test
 
 app_name = 'accounts_easy' # Namespace for URLs
 
 urlpatterns = [
+    path('test/', simple_test, name='simple_test'),
     path('', views.home, name='home'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('register/', views.register_user, name='register_user'),
