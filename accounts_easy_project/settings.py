@@ -154,3 +154,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
+
+# CSRF and Security Settings for Railway deployment
+CSRF_TRUSTED_ORIGINS = [
+    'https://accountease-production.up.railway.app',
+    'https://healthcheck.railway.app',
+]
+
+# Session and Cookie settings
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = False  # Railway handles SSL termination
+SESSION_COOKIE_SECURE = False  # Set to True only if you have HTTPS everywhere
+CSRF_COOKIE_SECURE = False     # Set to True only if you have HTTPS everywhere
+
+# Additional security headers
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
