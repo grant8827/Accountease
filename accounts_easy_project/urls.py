@@ -18,9 +18,15 @@ from django.contrib import admin
 from django.urls import path, include # Import include
 from django.contrib.auth import views as auth_views
 from django.shortcuts import redirect
+from django.http import HttpResponse
 from accounts_easy import views as app_views
 
+def health_check(request):
+    """Simple health check endpoint for Railway"""
+    return HttpResponse("OK", status=200)
+
 urlpatterns = [
+    path('health/', health_check, name='health_check'),
     path('', include('accounts_easy.urls')),  # Include app URLs at root
     path('admin/', admin.site.urls),
     # Authentication URLs
