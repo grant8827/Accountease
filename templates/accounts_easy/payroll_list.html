@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Payroll Runs - Accounts Easy{% endblock %}
+
+{% block content %}
+<div class="bg-white p-8 rounded-lg shadow-lg">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Payroll Runs</h1>
+
+    {% if payroll_runs %}
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+            <thead>
+                <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                    <th class="py-3 px-6 text-left">Start Date</th>
+                    <th class="py-3 px-6 text-left">End Date</th>
+                    <th class="py-3 px-6 text-left">Run Date</th>
+                    <th class="py-3 px-6 text-left">Status</th>
+                    <th class="py-3 px-6 text-left">Notes</th>
+                </tr>
+            </thead>
+            <tbody class="text-gray-700 text-sm font-light">
+                {% for pr in payroll_runs %}
+                <tr class="border-b border-gray-200 hover:bg-gray-50">
+                    <td class="py-3 px-6 text-left whitespace-nowrap">{{ pr.start_date }}</td>
+                    <td class="py-3 px-6 text-left">{{ pr.end_date }}</td>
+                    <td class="py-3 px-6 text-left">{{ pr.run_date }}</td>
+                    <td class="py-3 px-6 text-left">
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold
+                            {% if pr.status == 'processed' %}bg-green-200 text-green-800
+                            {% elif pr.status == 'paid' %}bg-blue-200 text-blue-800
+                            {% elif pr.status == 'draft' %}bg-yellow-200 text-yellow-800
+                            {% else %}bg-gray-200 text-gray-800{% endif %}">
+                            {{ pr.status|capfirst }}
+                        </span>
+                    </td>
+                    <td class="py-3 px-6 text-left">{{ pr.notes|default:"N/A" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-gray-600">No payroll runs found. Create one via the <a href="/admin/" class="text-blue-500 hover:underline">admin panel</a>.</p>
+    {% endif %}
+</div>
+{% endblock %}

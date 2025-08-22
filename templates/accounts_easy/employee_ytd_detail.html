@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+
+{% block title %}Employee YTD Details - {{ employee.first_name }} {{ employee.last_name }}{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow-lg rounded-lg">
+    <div class="px-6 py-4 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+            <h1 class="text-2xl font-bold text-gray-900">
+                YTD Details - {{ employee.first_name }} {{ employee.last_name }}
+            </h1>
+            <div class="flex space-x-2">
+                <a href="{% url 'accounts_easy:employee_ytd' %}" 
+                   class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition duration-300">
+                    Back to YTD List
+                </a>
+                <a href="{% url 'accounts_easy:employee_detail' employee.id %}" 
+                   class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition duration-300">
+                    View Employee
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-6">
+        <!-- Employee Information -->
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Employee Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <label class="block text-sm font-medium text-gray-600">Employee ID</label>
+                    <p class="text-lg text-gray-900">{{ employee.id }}</p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <label class="block text-sm font-medium text-gray-600">Position</label>
+                    <p class="text-lg text-gray-900">{{ employee.position|default:"Not specified" }}</p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <label class="block text-sm font-medium text-gray-600">Business</label>
+                    <p class="text-lg text-gray-900">{{ employee.business.name }}</p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <label class="block text-sm font-medium text-gray-600">Hire Date</label>
+                    <p class="text-lg text-gray-900">{{ employee.hire_date|date:"M d, Y"|default:"Not specified" }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- YTD Summary -->
+        {% if ytd_record %}
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Year-to-Date Summary ({{ ytd_record.year }})</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Earnings -->
+                <div class="bg-green-50 border border-green-200 p-6 rounded-lg">
+                    <h3 class="text-lg font-semibold text-green-800 mb-3">Earnings</h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Gross Pay:</span>
+                            <span class="font-semibold text-green-700">${{ ytd_record.total_gross_pay|floatformat:2 }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Net Pay:</span>
+                            <span class="font-semibold text-green-700">${{ ytd_record.total_net_pay|floatformat:2 }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Overtime:</span>
+                            <span class="font-semibold text-green-700">${{ ytd_record.total_overtime_pay|floatformat:2 }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Bonuses:</span>
+                            <span class="font-semibold text-green-700">${{ ytd_record.total_bonus|floatformat:2 }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deductions -->
+                <div class="bg-red-50 border border-red-200 p-6 rounded-lg">
+                    <h3 class="text-lg font-semibold text-red-800 mb-3">Deductions</h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Total Deductions:</span>
+                            <span class="font-semibold text-red-700">${{ ytd_record.total_deductions|floatformat:2 }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Federal Tax:</span>
+                            <span class="font-semibold text-red-700">${{ ytd_record.total_federal_tax|floatformat:2 }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">State Tax:</span>
+                            <span class="font-semibold text-red-700">${{ ytd_record.total_state_tax|floatformat:2 }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Social Security:</span>
+                            <span class="font-semibold text-red-700">${{ ytd_record.total_social_security|floatformat:2 }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Medicare:</span>
+                            <span class="font-semibold text-red-700">${{ ytd_record.total_medicare|floatformat:2 }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hours -->
+                <div class="bg-blue-50 border border-blue-200 p-6 rounded-lg">
+                    <h3 class="text-lg font-semibold text-blue-800 mb-3">Hours Worked</h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Regular Hours:</span>
+                            <span class="font-semibold text-blue-700">{{ ytd_record.total_regular_hours|floatformat:1 }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Overtime Hours:</span>
+                            <span class="font-semibold text-blue-700">{{ ytd_record.total_overtime_hours|floatformat:1 }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Total Hours:</span>
+                            <span class="font-semibold text-blue-700">{{ ytd_record.total_hours|floatformat:1 }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Payroll History -->
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Recent Payroll History</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pay Period</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gross Pay</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deductions</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Net Pay</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hours</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        {% if recent_payslips %}
+                            {% for payslip in recent_payslips %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {{ payslip.payroll_run.pay_period_start|date:"M d" }} - {{ payslip.payroll_run.pay_period_end|date:"M d, Y" }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    ${{ payslip.gross_pay|floatformat:2 }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    ${{ payslip.total_deductions|floatformat:2 }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    ${{ payslip.net_pay|floatformat:2 }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {{ payslip.regular_hours|floatformat:1 }}
+                                    {% if payslip.overtime_hours %}
+                                        + {{ payslip.overtime_hours|floatformat:1 }} OT
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <a href="{% url 'accounts_easy:payslip_detail' payslip.id %}" 
+                                       class="text-blue-600 hover:text-blue-900">View Payslip</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                                    No payroll history found for this employee.
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% else %}
+        <!-- No YTD Record -->
+        <div class="text-center py-12">
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+                <h3 class="text-lg font-medium text-yellow-800 mb-2">No YTD Record Found</h3>
+                <p class="text-yellow-700">
+                    No year-to-date record exists for {{ employee.first_name }} {{ employee.last_name }} for the current year.
+                    YTD records are created automatically when payroll runs are processed.
+                </p>
+                <div class="mt-4">
+                    <a href="{% url 'accounts_easy:create_payroll_run' %}" 
+                       class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-md transition duration-300">
+                        Create Payroll Run
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Action Buttons -->
+        <div class="flex justify-center space-x-4 mt-8">
+            <a href="{% url 'accounts_easy:employee_management' %}" 
+               class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-md transition duration-300">
+                Back to Employees
+            </a>
+            {% if ytd_record %}
+            <button onclick="window.print()" 
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-md transition duration-300">
+                Print YTD Summary
+            </button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+@media print {
+    .no-print {
+        display: none;
+    }
+    body {
+        background: white;
+    }
+    .shadow-lg {
+        box-shadow: none;
+    }
+}
+</style>
+{% endblock %}

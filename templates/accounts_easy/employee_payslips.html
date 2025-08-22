@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ employee.full_name }} Payslips - {{ business.name }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Employee Payslips</h1>
+                    <p class="mt-2 text-gray-600">{{ employee.full_name }} ({{ employee.employee_id }})</p>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="{% url 'accounts_easy:employee_bonuses' employee.id %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                        </svg>
+                        Manage Bonuses
+                    </a>
+                    <a href="{% url 'accounts_easy:employee_management' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        Back to Employees
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Employee Info Card -->
+        <div class="mb-6 bg-white shadow rounded-lg p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 h-12 w-12">
+                    <div class="h-12 w-12 rounded-full bg-indigo-500 flex items-center justify-center">
+                        <span class="text-lg font-medium text-white">{{ employee.first_name.0 }}{{ employee.last_name.0 }}</span>
+                    </div>
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-lg font-medium text-gray-900">{{ employee.full_name }}</h3>
+                    <p class="text-sm text-gray-500">{{ employee.job_title }} • Basic Salary: ${{ employee.basic_salary|floatformat:2 }}</p>
+                </div>
+                <div class="flex-shrink-0">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if employee.is_active %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                        {% if employee.is_active %}Active{% else %}Inactive{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payslips Table -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900">Payslip History</h2>
+                <p class="text-sm text-gray-500">{{ payslips.count }} payslips found</p>
+            </div>
+            
+            {% if payslips %}
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pay Period</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pay Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Basic Pay</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bonus</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gross Pay</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deductions</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Net Pay</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for payslip in payslips %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <div>
+                                    <div class="font-medium">{{ payslip.payroll_run.start_date|date:"M d" }} - {{ payslip.payroll_run.end_date|date:"M d, Y" }}</div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ payslip.payroll_run.run_date|date:"M d, Y" }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${{ payslip.basic_pay|floatformat:2 }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {% if payslip.bonus > 0 %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        ${{ payslip.bonus|floatformat:2 }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-gray-400">$0.00</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${{ payslip.gross_pay|floatformat:2 }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${{ payslip.total_deductions|floatformat:2 }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">${{ payslip.net_pay|floatformat:2 }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div class="flex space-x-2">
+                                    <a href="{% url 'accounts_easy:payslip_detail' payslip.id %}" class="text-indigo-600 hover:text-indigo-900">View</a>
+                                    <a href="{% url 'accounts_easy:print_payslip' payslip.id %}" class="text-green-600 hover:text-green-900" target="_blank">Print</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Summary Footer -->
+            <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
+                <div class="flex justify-between text-sm">
+                    <div class="flex space-x-8">
+                        <div>
+                            <span class="font-medium text-gray-500">Total Payslips:</span>
+                            <span class="text-gray-900">{{ payslips.count }}</span>
+                        </div>
+                        <div>
+                            <span class="font-medium text-gray-500">Total Net Pay:</span>
+                            <span class="text-gray-900">${{ payslips|dictsort:"net_pay"|join:", "|slice:":200" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="px-6 py-12 text-center">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">No payslips found</h3>
+                <p class="mt-1 text-sm text-gray-500">This employee doesn't have any payslips yet.</p>
+                <div class="mt-6">
+                    <a href="{% url 'accounts_easy:create_payroll_run' %}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Create Payroll Run
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Payroll Run - {{ business.name }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Create Payroll Run</h1>
+                    <p class="mt-2 text-gray-600">Generate payslips for all active employees</p>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="{% url 'accounts_easy:payroll_run_list' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        Back to Payroll Runs
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create Payroll Run Form -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900">Payroll Run Details</h2>
+                <p class="text-sm text-gray-500">Set up the payroll period and processing date</p>
+            </div>
+            
+            <form method="post" class="p-6">
+                {% csrf_token %}
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="start_date" class="block text-sm font-medium text-gray-700">Payroll Period Start Date</label>
+                        <input type="date" id="start_date" name="start_date" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        <p class="mt-1 text-xs text-gray-500">First day of the payroll period</p>
+                    </div>
+
+                    <div>
+                        <label for="end_date" class="block text-sm font-medium text-gray-700">Payroll Period End Date</label>
+                        <input type="date" id="end_date" name="end_date" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        <p class="mt-1 text-xs text-gray-500">Last day of the payroll period</p>
+                    </div>
+
+                    <div>
+                        <label for="run_date" class="block text-sm font-medium text-gray-700">Payroll Run Date</label>
+                        <input type="date" id="run_date" name="run_date" value="{{ today }}" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        <p class="mt-1 text-xs text-gray-500">Date when payroll is processed</p>
+                    </div>
+
+                    <div>
+                        <label for="notes" class="block text-sm font-medium text-gray-700">Notes</label>
+                        <textarea id="notes" name="notes" rows="4" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Optional notes about this payroll run"></textarea>
+                    </div>
+                </div>
+
+                <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-blue-800">What happens when you create a payroll run?</h3>
+                            <div class="mt-2 text-sm text-blue-700">
+                                <ul class="list-disc list-inside space-y-1">
+                                    <li><strong>Automatic payslip generation:</strong> Payslips will be created for ALL active employees in your business</li>
+                                    <li><strong>Bonus inclusion:</strong> Monthly bonuses for the payroll period will be automatically included in calculations</li>
+                                    <li><strong>Tax calculations:</strong> All tax deductions (PAYE, NIS, NHT, HEART, Education) will be calculated based on your payroll configuration</li>
+                                    <li><strong>YTD updates:</strong> Year-to-date (YTD) records will be updated for all employees</li>
+                                    <li><strong>Bonus tracking:</strong> Applied bonuses will be marked as processed and cannot be modified</li>
+                                    <li><strong>Net pay calculation:</strong> Final net pay will be calculated automatically (Gross Pay - Total Deductions)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end space-x-3">
+                    <a href="{% url 'accounts_easy:payroll_run_list' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        Cancel
+                    </a>
+                    <button type="submit" class="inline-flex items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-200">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                        </svg>
+                        Create Payroll Run & Generate Payslips
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-populate end date when start date is selected
+document.getElementById('start_date').addEventListener('change', function() {
+    const startDate = new Date(this.value);
+    const endDate = new Date(startDate);
+    endDate.setMonth(endDate.getMonth() + 1);
+    endDate.setDate(0); // Last day of the month
+    
+    document.getElementById('end_date').value = endDate.toISOString().split('T')[0];
+});
+
+// Add loading state to form submission
+document.querySelector('form').addEventListener('submit', function(e) {
+    const submitButton = this.querySelector('button[type="submit"]');
+    const originalText = submitButton.innerHTML;
+    
+    submitButton.disabled = true;
+    submitButton.innerHTML = `
+        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Creating Payroll Run & Generating Payslips...
+    `;
+    
+    // Re-enable button after 10 seconds as a safety measure
+    setTimeout(() => {
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalText;
+    }, 10000);
+});
+</script>
+{% endblock %}

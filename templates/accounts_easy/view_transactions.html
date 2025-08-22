@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}View Transactions - {{ business.name }}{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto bg-white p-4 sm:p-8 rounded-lg shadow mt-8">
+    <h1 class="text-2xl font-bold mb-4">Transactions</h1>
+    <div class="overflow-x-auto">
+        <table class="min-w-full border rounded text-sm">
+            <thead>
+                <tr class="bg-gray-100">
+                    <th class="px-4 py-2 text-left whitespace-nowrap">Date</th>
+                    <th class="px-4 py-2 text-left whitespace-nowrap">Type</th>
+                    <th class="px-4 py-2 text-left whitespace-nowrap">Amount</th>
+                    <th class="px-4 py-2 text-left whitespace-nowrap">Description</th>
+                    <th class="px-4 py-2 text-left whitespace-nowrap">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transaction in transactions %}
+                <tr>
+                    <td class="px-4 py-2 whitespace-nowrap">{{ transaction.date }}</td>
+                    <td class="px-4 py-2 whitespace-nowrap">{{ transaction.get_transaction_type_display }}</td>
+                    <td class="px-4 py-2 whitespace-nowrap">${{ transaction.amount }}</td>
+                    <td class="px-4 py-2 whitespace-nowrap">{{ transaction.description }}</td>
+                    <td class="px-4 py-2 whitespace-nowrap">
+                        <a href="{% url 'accounts_easy:edit_transaction' transaction.id %}" class="text-blue-600 hover:underline mr-2">Edit</a>
+                        <a href="{% url 'accounts_easy:delete_transaction' transaction.id %}" class="text-red-600 hover:underline">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="px-4 py-8 text-center text-gray-500">No transactions found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

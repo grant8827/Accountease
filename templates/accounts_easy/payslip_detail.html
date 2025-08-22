@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block title %}Payslip - {{ employee.full_name }} - {{ business.name }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Payslip Details</h1>
+                    <p class="mt-2 text-gray-600">{{ employee.full_name }} - {{ payroll_run.start_date }} to {{ payroll_run.end_date }}</p>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="{% url 'accounts_easy:print_payslip' payslip.id %}" target="_blank" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                        </svg>
+                        Print Payslip
+                    </a>
+                    <a href="{% url 'accounts_easy:payroll_run_detail' payroll_run.id %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        Back to Payroll Run
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payslip Content -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <!-- Company Header -->
+            <div class="bg-indigo-600 px-6 py-4">
+                <div class="flex justify-between items-center text-white">
+                    <div>
+                        <h2 class="text-xl font-bold">{{ business.name }}</h2>
+                        <p class="text-indigo-100">{{ business.address }}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-indigo-100">Tax ID: {{ business.tax_id|default:"N/A" }}</p>
+                        <p class="text-indigo-100">Phone: {{ business.phone|default:"N/A" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Employee and Payroll Information -->
+            <div class="px-6 py-6 border-b border-gray-200">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Employee Information</h3>
+                        <dl class="space-y-2">
+                            <div class="flex justify-between">
+                                <dt class="text-sm font-medium text-gray-500">Name:</dt>
+                                <dd class="text-sm text-gray-900">{{ employee.full_name }}</dd>
+                            </div>
+                            <div class="flex justify-between">
+                                <dt class="text-sm font-medium text-gray-500">Employee ID:</dt>
+                                <dd class="text-sm text-gray-900">{{ employee.employee_id }}</dd>
+                            </div>
+                            <div class="flex justify-between">
+                                <dt class="text-sm font-medium text-gray-500">Job Title:</dt>
+                                <dd class="text-sm text-gray-900">{{ employee.job_title }}</dd>
+                            </div>
+                            <div class="flex justify-between">
+                                <dt class="text-sm font-medium text-gray-500">Email:</dt>
+                                <dd class="text-sm text-gray-900">{{ employee.email }}</dd>
+                            </div>
+                        </dl>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Payroll Information</h3>
+                        <dl class="space-y-2">
+                            <div class="flex justify-between">
+                                <dt class="text-sm font-medium text-gray-500">Pay Period:</dt>
+                                <dd class="text-sm text-gray-900">{{ payroll_run.start_date }} to {{ payroll_run.end_date }}</dd>
+                            </div>
+                            <div class="flex justify-between">
+                                <dt class="text-sm font-medium text-gray-500">Pay Date:</dt>
+                                <dd class="text-sm text-gray-900">{{ payroll_run.run_date }}</dd>
+                            </div>
+                            <div class="flex justify-between">
+                                <dt class="text-sm font-medium text-gray-500">Generated:</dt>
+                                <dd class="text-sm text-gray-900">{{ payslip.generated_date|date:"M d, Y" }}</dd>
+                            </div>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Earnings and Deductions -->
+            <div class="px-6 py-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Earnings -->
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Earnings</h3>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <dl class="space-y-3">
+                                <div class="flex justify-between">
+                                    <dt class="text-sm font-medium text-gray-600">Basic Salary:</dt>
+                                    <dd class="text-sm text-gray-900">${{ payslip.basic_pay|floatformat:2 }}</dd>
+                                </div>
+                                {% if payslip.overtime_pay > 0 %}
+                                <div class="flex justify-between">
+                                    <dt class="text-sm font-medium text-gray-600">Overtime Pay:</dt>
+                                    <dd class="text-sm text-gray-900">${{ payslip.overtime_pay|floatformat:2 }}</dd>
+                                </div>
+                                {% endif %}
+                                {% if payslip.bonus > 0 %}
+                                <div class="flex justify-between">
+                                    <dt class="text-sm font-medium text-gray-600">Bonus:</dt>
+                                    <dd class="text-sm text-gray-900">${{ payslip.bonus|floatformat:2 }}</dd>
+                                </div>
+                                {% endif %}
+                                <div class="border-t border-gray-200 pt-3">
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm font-bold text-gray-900">Gross Pay:</dt>
+                                        <dd class="text-sm font-bold text-gray-900">${{ payslip.gross_pay|floatformat:2 }}</dd>
+                                    </div>
+                                </div>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <!-- Deductions -->
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Deductions</h3>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <dl class="space-y-3">
+                                {% if payslip.paye_tax > 0 %}
+                                <div class="flex justify-between">
+                                    <dt class="text-sm font-medium text-gray-600">PAYE Tax:</dt>
+                                    <dd class="text-sm text-gray-900">${{ payslip.paye_tax|floatformat:2 }}</dd>
+                                </div>
+                                {% endif %}
+                                {% if payslip.nis_deduction > 0 %}
+                                <div class="flex justify-between">
+                                    <dt class="text-sm font-medium text-gray-600">NIS:</dt>
+                                    <dd class="text-sm text-gray-900">${{ payslip.nis_deduction|floatformat:2 }}</dd>
+                                </div>
+                                {% endif %}
+                                {% if payslip.nht_deduction > 0 %}
+                                <div class="flex justify-between">
+                                    <dt class="text-sm font-medium text-gray-600">NHT:</dt>
+                                    <dd class="text-sm text-gray-900">${{ payslip.nht_deduction|floatformat:2 }}</dd>
+                                </div>
+                                {% endif %}
+                                {% if payslip.heart_deduction > 0 %}
+                                <div class="flex justify-between">
+                                    <dt class="text-sm font-medium text-gray-600">HEART:</dt>
+                                    <dd class="text-sm text-gray-900">${{ payslip.heart_deduction|floatformat:2 }}</dd>
+                                </div>
+                                {% endif %}
+                                {% if payslip.ed_deduction > 0 %}
+                                <div class="flex justify-between">
+                                    <dt class="text-sm font-medium text-gray-600">Education Tax:</dt>
+                                    <dd class="text-sm text-gray-900">${{ payslip.ed_deduction|floatformat:2 }}</dd>
+                                </div>
+                                {% endif %}
+                                {% if payslip.other_deductions > 0 %}
+                                <div class="flex justify-between">
+                                    <dt class="text-sm font-medium text-gray-600">Other Deductions:</dt>
+                                    <dd class="text-sm text-gray-900">${{ payslip.other_deductions|floatformat:2 }}</dd>
+                                </div>
+                                {% endif %}
+                                <div class="border-t border-gray-200 pt-3">
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm font-bold text-gray-900">Total Deductions:</dt>
+                                        <dd class="text-sm font-bold text-gray-900">${{ payslip.total_deductions|floatformat:2 }}</dd>
+                                    </div>
+                                </div>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Net Pay -->
+            <div class="bg-green-50 border-t border-gray-200 px-6 py-6">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-bold text-green-900">Net Pay</h3>
+                    <span class="text-2xl font-bold text-green-900">${{ payslip.net_pay|floatformat:2 }}</span>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="bg-gray-50 px-6 py-4 text-center">
+                <p class="text-xs text-gray-500">
+                    This payslip was generated on {{ payslip.generated_date|date:"F d, Y \a\\t g:i A" }}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

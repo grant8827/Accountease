@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payslip - {{ employee.full_name }} - {{ business.name }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #333;
+            background: white;
+        }
+        
+        .payslip {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+        }
+        
+        .header {
+            background: #4f46e5;
+            color: white;
+            padding: 20px;
+            margin: -20px -20px 20px -20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .company-info h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .company-info p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .payslip-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 20px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .info-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            gap: 40px;
+        }
+        
+        .info-box {
+            flex: 1;
+        }
+        
+        .info-box h3 {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #4f46e5;
+            border-bottom: 1px solid #e5e5e5;
+            padding-bottom: 5px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .info-row .label {
+            font-weight: bold;
+            color: #666;
+        }
+        
+        .earnings-deductions {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .earnings, .deductions {
+            flex: 1;
+        }
+        
+        .earnings h3 {
+            color: #059669;
+            background: #f0fdf4;
+            padding: 10px;
+            margin: -10px -10px 15px -10px;
+            text-align: center;
+            font-size: 16px;
+        }
+        
+        .deductions h3 {
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 10px;
+            margin: -10px -10px 15px -10px;
+            text-align: center;
+            font-size: 16px;
+        }
+        
+        .amount-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .amount-row.total {
+            border-top: 2px solid #374151;
+            border-bottom: 2px solid #374151;
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        .net-pay {
+            background: #059669;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin: 30px -20px -20px -20px;
+        }
+        
+        .net-pay h2 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .net-pay .amount {
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+            border-top: 1px solid #e5e5e5;
+            padding-top: 15px;
+        }
+        
+        @media print {
+            body {
+                margin: 0;
+            }
+            
+            .payslip {
+                margin: 0;
+                border: none;
+                box-shadow: none;
+            }
+            
+            .no-print {
+                display: none;
+            }
+        }
+        
+        .print-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 1000;
+        }
+        
+        .print-button:hover {
+            background: #3730a3;
+        }
+    </style>
+</head>
+<body>
+    <button class="print-button no-print" onclick="window.print()">Print Payslip</button>
+    
+    <div class="payslip">
+        <!-- Header -->
+        <div class="header">
+            <div class="company-info">
+                <h1>{{ business.name }}</h1>
+                <p>{{ business.address }}</p>
+                {% if business.phone %}
+                <p>Phone: {{ business.phone }}</p>
+                {% endif %}
+            </div>
+            <div class="company-details">
+                <p><strong>Tax ID:</strong> {{ business.tax_id|default:"N/A" }}</p>
+                <p><strong>Email:</strong> {{ business.email }}</p>
+            </div>
+        </div>
+        
+        <div class="payslip-title">
+            Employee Payslip
+        </div>
+        
+        <!-- Employee and Payroll Information -->
+        <div class="info-section">
+            <div class="info-box">
+                <h3>Employee Information</h3>
+                <div class="info-row">
+                    <span class="label">Name:</span>
+                    <span>{{ employee.full_name }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Employee ID:</span>
+                    <span>{{ employee.employee_id }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Job Title:</span>
+                    <span>{{ employee.job_title }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Email:</span>
+                    <span>{{ employee.email }}</span>
+                </div>
+            </div>
+            
+            <div class="info-box">
+                <h3>Payroll Information</h3>
+                <div class="info-row">
+                    <span class="label">Pay Period:</span>
+                    <span>{{ payroll_run.start_date }} to {{ payroll_run.end_date }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Pay Date:</span>
+                    <span>{{ payroll_run.run_date }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Generated:</span>
+                    <span>{{ payslip.generated_date|date:"M d, Y" }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Earnings and Deductions -->
+        <div class="earnings-deductions">
+            <div class="earnings">
+                <h3>Earnings</h3>
+                <div class="amount-row">
+                    <span>Basic Salary:</span>
+                    <span>${{ payslip.basic_pay|floatformat:2 }}</span>
+                </div>
+                {% if payslip.overtime_pay > 0 %}
+                <div class="amount-row">
+                    <span>Overtime Pay:</span>
+                    <span>${{ payslip.overtime_pay|floatformat:2 }}</span>
+                </div>
+                {% endif %}
+                {% if payslip.bonus > 0 %}
+                <div class="amount-row">
+                    <span>Bonus:</span>
+                    <span>${{ payslip.bonus|floatformat:2 }}</span>
+                </div>
+                {% endif %}
+                <div class="amount-row total">
+                    <span>Gross Pay:</span>
+                    <span>${{ payslip.gross_pay|floatformat:2 }}</span>
+                </div>
+            </div>
+            
+            <div class="deductions">
+                <h3>Deductions</h3>
+                {% if payslip.paye_tax > 0 %}
+                <div class="amount-row">
+                    <span>PAYE Tax:</span>
+                    <span>${{ payslip.paye_tax|floatformat:2 }}</span>
+                </div>
+                {% endif %}
+                {% if payslip.nis_deduction > 0 %}
+                <div class="amount-row">
+                    <span>NIS:</span>
+                    <span>${{ payslip.nis_deduction|floatformat:2 }}</span>
+                </div>
+                {% endif %}
+                {% if payslip.nht_deduction > 0 %}
+                <div class="amount-row">
+                    <span>NHT:</span>
+                    <span>${{ payslip.nht_deduction|floatformat:2 }}</span>
+                </div>
+                {% endif %}
+                {% if payslip.heart_deduction > 0 %}
+                <div class="amount-row">
+                    <span>HEART:</span>
+                    <span>${{ payslip.heart_deduction|floatformat:2 }}</span>
+                </div>
+                {% endif %}
+                {% if payslip.ed_deduction > 0 %}
+                <div class="amount-row">
+                    <span>Education Tax:</span>
+                    <span>${{ payslip.ed_deduction|floatformat:2 }}</span>
+                </div>
+                {% endif %}
+                {% if payslip.other_deductions > 0 %}
+                <div class="amount-row">
+                    <span>Other Deductions:</span>
+                    <span>${{ payslip.other_deductions|floatformat:2 }}</span>
+                </div>
+                {% endif %}
+                <div class="amount-row total">
+                    <span>Total Deductions:</span>
+                    <span>${{ payslip.total_deductions|floatformat:2 }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Net Pay -->
+        <div class="net-pay">
+            <h2>Net Pay</h2>
+            <div class="amount">${{ payslip.net_pay|floatformat:2 }}</div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>This payslip was generated on {{ payslip.generated_date|date:"F d, Y \a\\t g:i A" }}</p>
+            <p>{{ business.name }} - Payroll System</p>
+        </div>
+    </div>
+    
+    <script>
+        // Auto print when page loads (optional)
+        // window.onload = function() { window.print(); }
+    </script>
+</body>
+</html>

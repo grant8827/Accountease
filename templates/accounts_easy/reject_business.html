@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Reject Business - Accounts Easy{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">Reject Business Registration</h1>
+        <p class="text-gray-600 mt-2">Reject business registration for {{ business.name }}</p>
+    </div>
+
+    <div class="bg-white shadow rounded-lg p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <div>
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Business Information</h2>
+                <dl class="space-y-4">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Business Name</dt>
+                        <dd class="text-lg text-gray-900 font-medium">{{ business.name }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Registration Number</dt>
+                        <dd class="text-sm text-gray-900">{{ business.registration_number|default:"Not provided" }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Email</dt>
+                        <dd class="text-sm text-gray-900">{{ business.email }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Phone</dt>
+                        <dd class="text-sm text-gray-900">{{ business.phone|default:"Not provided" }}</dd>
+                    </div>
+                </dl>
+            </div>
+
+            <div>
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Owner Information</h2>
+                <dl class="space-y-4">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Owner Name</dt>
+                        <dd class="text-lg text-gray-900 font-medium">{{ business.owner.get_full_name|default:business.owner.username }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Email</dt>
+                        <dd class="text-sm text-gray-900">{{ business.owner.email }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Registration Submitted</dt>
+                        <dd class="text-sm text-gray-900">{{ business.created_at|date:"F d, Y g:i A" }}</dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+
+        <div class="border-t border-gray-200 pt-6">
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">Reject Business Registration</h3>
+                        <div class="mt-2 text-sm text-red-700">
+                            <p>Please provide a clear reason for rejecting this business registration. This information will be helpful for the business owner to understand what needs to be corrected.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-6">
+                    <label for="rejection_reason" class="block text-sm font-medium text-gray-700 mb-2">
+                        Reason for Rejection *
+                    </label>
+                    <textarea 
+                        id="rejection_reason" 
+                        name="rejection_reason" 
+                        rows="4" 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                        placeholder="Please provide a detailed reason for rejecting this business registration..."
+                        required
+                    ></textarea>
+                    <p class="mt-2 text-sm text-gray-500">Common reasons include: incomplete information, invalid registration documents, suspicious activity, etc.</p>
+                </div>
+
+                <div class="flex space-x-4">
+                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition duration-300 flex items-center">
+                        <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        Reject Business
+                    </button>
+                    <a href="{% url 'accounts_easy:admin_dashboard' %}" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-medium transition duration-300 flex items-center">
+                        <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        Back to Dashboard
+                    </a>
+                    <a href="{% url 'accounts_easy:approve_business' business.id %}" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition duration-300 flex items-center">
+                        <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Approve Instead
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

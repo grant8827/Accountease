@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Bonus - {{ business.name }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Delete Bonus</h1>
+            <p class="mt-2 text-gray-600">Confirm deletion of employee bonus</p>
+        </div>
+
+        <!-- Warning Card -->
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <div class="bg-red-50 border-b border-red-200 px-6 py-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">Warning</h3>
+                        <div class="mt-2 text-sm text-red-700">
+                            <p>You are about to delete this bonus. This action cannot be undone.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="px-6 py-6">
+                <!-- Bonus Details -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Bonus Details</h3>
+                    <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Employee</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ bonus.employee.full_name }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Employee ID</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ bonus.employee.employee_id }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Bonus Type</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ bonus.get_bonus_type_display }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Amount</dt>
+                            <dd class="mt-1 text-sm text-gray-900 font-medium">${{ bonus.amount|floatformat:2 }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Period</dt>
+                            <dd class="mt-1 text-sm text-gray-900">{{ bonus.month_name }} {{ bonus.year }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Status</dt>
+                            <dd class="mt-1">
+                                {% if bonus.is_applied %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        Applied
+                                    </span>
+                                {% else %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                        Pending
+                                    </span>
+                                {% endif %}
+                            </dd>
+                        </div>
+                    </dl>
+                    
+                    {% if bonus.description %}
+                    <div class="mt-4">
+                        <dt class="text-sm font-medium text-gray-500">Description</dt>
+                        <dd class="mt-1 text-sm text-gray-900">{{ bonus.description }}</dd>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Confirmation Form -->
+                <form method="post" class="mt-6">
+                    {% csrf_token %}
+                    
+                    <div class="flex justify-end space-x-3">
+                        <a href="{% url 'accounts_easy:employee_bonuses' bonus.employee.id %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                            Cancel
+                        </a>
+                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            Delete Bonus
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

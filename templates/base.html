@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Accounts Easy{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    {% if user.is_authenticated %}
+    <nav class="bg-blue-600 p-4 text-white shadow-md" x-data="{ open: false }">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="{% url 'accounts_easy:dashboard' %}" class="text-2xl font-bold rounded-md px-3 py-1 hover:bg-blue-700 transition duration-300">
+                Accounts Easy
+                {% if business %}
+                    <span class="text-blue-200 text-base ml-2">- {{ business.name }}</span>
+                {% endif %}
+            </a>
+            <!-- Hamburger button for mobile -->
+            <button @click="open = !open" class="md:hidden focus:outline-none ml-2">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+            <!-- Desktop Nav -->
+            <div class="hidden md:flex items-center space-x-4">
+                <a href="{% url 'accounts_easy:dashboard' %}" class="text-lg hover:underline rounded-md px-3 py-1 hover:bg-blue-700 transition duration-300">Dashboard</a>
+                <!-- Employee Management Dropdown -->
+                <div class="relative group">
+                    <button class="text-lg hover:underline rounded-md px-3 py-1 hover:bg-blue-700 transition duration-300 flex items-center">
+                        Employees
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-10">
+                        <a href="{% url 'accounts_easy:employee_management' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Manage Employees</a>
+                        <a href="{% url 'accounts_easy:add_employee' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Add Employee</a>
+                        <a href="{% url 'accounts_easy:employee_ytd' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">YTD Records</a>
+                    </div>
+                </div>
+                <!-- Payroll Management Dropdown -->
+                <div class="relative group">
+                    <button class="text-lg hover:underline rounded-md px-3 py-1 hover:bg-blue-700 transition duration-300 flex items-center">
+                        Payroll
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-10">
+                        <a href="{% url 'accounts_easy:create_payroll_run' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Create Payroll Run</a>
+                        <a href="{% url 'accounts_easy:payroll_run_list' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Payroll History</a>
+                        <a href="{% url 'accounts_easy:payroll_setup' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Payroll Setup</a>
+                        <a href="{% url 'accounts_easy:tax_setup' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Tax Configuration</a>
+                        <a href="{% url 'accounts_easy:deduction_setup' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Deductions</a>
+                        <a href="{% url 'accounts_easy:payroll_reports' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Reports</a>
+                    </div>
+                </div>
+                <a href="{% url 'accounts_easy:business_info' %}" class="text-lg hover:underline rounded-md px-3 py-1 hover:bg-blue-700 transition duration-300">Business Info</a>
+                {% if user.is_superuser or user.is_staff %}
+                    <a href="{% url 'accounts_easy:admin_dashboard' %}" class="text-lg hover:underline rounded-md px-3 py-1 hover:bg-yellow-500 bg-yellow-400 text-black transition duration-300">Admin</a>
+                    <a href="/admin/" class="text-lg hover:underline rounded-md px-3 py-1 hover:bg-blue-700 transition duration-300" target="_blank">Django Admin</a>
+                {% endif %}
+                <div class="flex items-center space-x-2">
+                    <span class="text-blue-200">{{ user.username }}</span>
+                    <form method="post" action="{% url 'logout' %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded-md transition duration-300">Logout</button>
+                    </form>
+                </div>
+            </div>
+            <!-- Mobile Nav -->
+            <div class="md:hidden absolute top-16 left-0 w-full bg-blue-600 z-50" x-show="open" @click.away="open = false">
+                <div class="flex flex-col space-y-2 p-4">
+                    <a href="{% url 'accounts_easy:dashboard' %}" class="text-lg hover:underline rounded-md px-3 py-2 hover:bg-blue-700 transition duration-300">Dashboard</a>
+                    <div class="border-t border-blue-400 my-2"></div>
+                    <div class="font-semibold">Employees</div>
+                    <a href="{% url 'accounts_easy:employee_management' %}" class="block px-4 py-2 text-sm hover:bg-blue-700 rounded">Manage Employees</a>
+                    <a href="{% url 'accounts_easy:add_employee' %}" class="block px-4 py-2 text-sm hover:bg-blue-700 rounded">Add Employee</a>
+                    <a href="{% url 'accounts_easy:employee_ytd' %}" class="block px-4 py-2 text-sm hover:bg-blue-700 rounded">YTD Records</a>
+                    <div class="border-t border-blue-400 my-2"></div>
+                    <div class="font-semibold">Payroll</div>
+                    <a href="{% url 'accounts_easy:create_payroll_run' %}" class="block px-4 py-2 text-sm hover:bg-blue-700 rounded">Create Payroll Run</a>
+                    <a href="{% url 'accounts_easy:payroll_run_list' %}" class="block px-4 py-2 text-sm hover:bg-blue-700 rounded">Payroll History</a>
+                    <a href="{% url 'accounts_easy:payroll_setup' %}" class="block px-4 py-2 text-sm hover:bg-blue-700 rounded">Payroll Setup</a>
+                    <a href="{% url 'accounts_easy:tax_setup' %}" class="block px-4 py-2 text-sm hover:bg-blue-700 rounded">Tax Configuration</a>
+                    <a href="{% url 'accounts_easy:deduction_setup' %}" class="block px-4 py-2 text-sm hover:bg-blue-700 rounded">Deductions</a>
+                    <a href="{% url 'accounts_easy:payroll_reports' %}" class="block px-4 py-2 text-sm hover:bg-blue-700 rounded">Reports</a>
+                    <div class="border-t border-blue-400 my-2"></div>
+                    <a href="{% url 'accounts_easy:business_info' %}" class="text-lg hover:underline rounded-md px-3 py-2 hover:bg-blue-700 transition duration-300">Business Info</a>
+                    {% if user.is_superuser or user.is_staff %}
+                        <a href="{% url 'accounts_easy:admin_dashboard' %}" class="text-lg hover:underline rounded-md px-3 py-2 hover:bg-yellow-500 bg-yellow-400 text-black transition duration-300">Admin</a>
+                        <a href="/admin/" class="text-lg hover:underline rounded-md px-3 py-2 hover:bg-blue-700 transition duration-300" target="_blank">Django Admin</a>
+                    {% endif %}
+                    <div class="flex items-center space-x-2 mt-2">
+                        <span class="text-blue-200">{{ user.username }}</span>
+                        <form method="post" action="{% url 'logout' %}" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded-md transition duration-300">Logout</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <main class="container mx-auto p-6 flex-grow">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mb-4 bg-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% else %}blue{% endif %}-100 border border-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% else %}blue{% endif %}-400 text-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% else %}blue{% endif %}-700 px-4 py-3 rounded">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="bg-gray-800 text-white p-4 text-center mt-auto">
+        <div class="container mx-auto">
+            <p>&copy; 2025 Accounts Easy. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

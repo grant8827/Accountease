@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Business - Admin - Accounts Easy{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-red-900">Delete Business Account</h1>
+        <p class="text-gray-600 mt-2">Permanently delete business and all associated data</p>
+    </div>
+
+    <!-- Warning Card -->
+    <div class="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
+        <div class="flex items-start">
+            <svg class="h-6 w-6 text-red-400 mr-3 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+            <div>
+                <h3 class="text-lg font-medium text-red-800">⚠️ Warning: This action cannot be undone!</h3>
+                <p class="text-red-700 mt-2">Deleting this business will permanently remove:</p>
+                <ul class="text-red-700 mt-2 list-disc ml-5">
+                    <li>The business account and all settings</li>
+                    <li>All {{ employee_count }} employee records</li>
+                    <li>All {{ payroll_runs_count }} payroll runs and payslips</li>
+                    <li>All tax configurations and YTD data</li>
+                    <li>All deduction types and employee deductions</li>
+                    <li>All payroll reports and configurations</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Business Information -->
+    <div class="bg-white shadow rounded-lg mb-6">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-800">Business to be Deleted</h2>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">{{ business.name }}</h3>
+                    <dl class="space-y-3">
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Registration Number</dt>
+                            <dd class="text-sm text-gray-900">{{ business.registration_number|default:"Not provided" }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Email</dt>
+                            <dd class="text-sm text-gray-900">{{ business.email }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Phone</dt>
+                            <dd class="text-sm text-gray-900">{{ business.phone|default:"Not provided" }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Status</dt>
+                            <dd class="text-sm">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                    {% if business.status == 'approved' %}bg-green-100 text-green-800
+                                    {% elif business.status == 'pending' %}bg-yellow-100 text-yellow-800
+                                    {% else %}bg-red-100 text-red-800{% endif %}">
+                                    {{ business.get_status_display }}
+                                </span>
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Owner Information</h3>
+                    <dl class="space-y-3">
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Owner Name</dt>
+                            <dd class="text-sm text-gray-900">{{ business.owner.get_full_name|default:business.owner.username }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Owner Email</dt>
+                            <dd class="text-sm text-gray-900">{{ business.owner.email }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-sm font-medium text-gray-500">Registration Date</dt>
+                            <dd class="text-sm text-gray-900">{{ business.created_at|date:"F d, Y" }}</dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Summary -->
+    <div class="bg-white shadow rounded-lg mb-8">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-800">Data to be Deleted</h2>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-red-600">{{ employee_count }}</div>
+                    <div class="text-sm text-gray-500">Employees</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-red-600">{{ payroll_runs_count }}</div>
+                    <div class="text-sm text-gray-500">Payroll Runs</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-red-600">1</div>
+                    <div class="text-sm text-gray-500">Business Account</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-red-600">ALL</div>
+                    <div class="text-sm text-gray-500">Related Data</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Form -->
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-800">Confirm Deletion</h2>
+        </div>
+        <div class="p-6">
+            <form method="post" onsubmit="return confirm('Are you absolutely sure you want to permanently delete {{ business.name }} and all its data? This action cannot be undone!');">
+                {% csrf_token %}
+                
+                <div class="mb-6">
+                    <label class="flex items-center">
+                        <input type="checkbox" class="form-checkbox h-4 w-4 text-red-600" required>
+                        <span class="ml-2 text-sm text-gray-700">
+                            I understand that this action will permanently delete <strong>{{ business.name }}</strong> and all associated data
+                        </span>
+                    </label>
+                </div>
+
+                <div class="mb-6">
+                    <label class="flex items-center">
+                        <input type="checkbox" class="form-checkbox h-4 w-4 text-red-600" required>
+                        <span class="ml-2 text-sm text-gray-700">
+                            I confirm that I have the authority to delete this business account
+                        </span>
+                    </label>
+                </div>
+
+                <div class="flex justify-between">
+                    <a href="{% url 'accounts_easy:admin_dashboard' %}" 
+                       class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-md transition duration-300">
+                        Cancel
+                    </a>
+                    <button type="submit" 
+                            class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-md transition duration-300">
+                        🗑️ Permanently Delete Business
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Additional Information -->
+    <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h3 class="text-sm font-medium text-blue-900 mb-2">Alternative Actions</h3>
+        <p class="text-sm text-blue-700">
+            Instead of deleting, you might consider:
+        </p>
+        <ul class="text-sm text-blue-700 mt-1 list-disc ml-5">
+            <li>Rejecting the business application if it's pending approval</li>
+            <li>Deactivating the business temporarily</li>
+            <li>Contacting the business owner first</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

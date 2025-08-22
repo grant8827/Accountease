@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Edit Transaction - {{ business.name }}{% endblock %}
+{% block content %}
+<div class="max-w-xl mx-auto bg-white p-8 rounded-lg shadow mt-8">
+    <h1 class="text-2xl font-bold mb-4">Edit Transaction</h1>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-4">
+            <label for="transaction_type" class="block font-medium mb-1">Type</label>
+            <select id="transaction_type" name="transaction_type" class="w-full border rounded px-3 py-2">
+                <option value="income" {% if transaction.transaction_type == 'income' %}selected{% endif %}>Income</option>
+                <option value="expenditure" {% if transaction.transaction_type == 'expenditure' %}selected{% endif %}>Expenditure</option>
+            </select>
+        </div>
+        <div class="mb-4">
+            <label for="amount" class="block font-medium mb-1">Amount</label>
+            <input type="number" step="0.01" id="amount" name="amount" class="w-full border rounded px-3 py-2" value="{{ transaction.amount }}" required>
+        </div>
+        <div class="mb-4">
+            <label for="description" class="block font-medium mb-1">Description</label>
+            <input type="text" id="description" name="description" class="w-full border rounded px-3 py-2" value="{{ transaction.description }}" required>
+        </div>
+        <div class="mb-4">
+            <label for="date" class="block font-medium mb-1">Date</label>
+            <input type="date" id="date" name="date" class="w-full border rounded px-3 py-2" value="{{ transaction.date|date:'Y-m-d' }}" required>
+        </div>
+        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">Save Changes</button>
+        <a href="{% url 'accounts_easy:view_transactions' %}" class="ml-4 text-blue-600 hover:underline">Cancel</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Employee - Accounts Easy{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">Add New Employee</h1>
+        <p class="text-gray-600 mt-2">Add a new employee to {{ business.name }}</p>
+    </div>
+
+    <div class="bg-white shadow rounded-lg p-6">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Personal Information -->
+                <div class="space-y-6">
+                    <h2 class="text-xl font-semibold text-gray-800 border-b border-gray-200 pb-2">Personal Information</h2>
+                    
+                    <div>
+                        <label for="employee_id" class="block text-sm font-medium text-gray-700 mb-1">
+                            Employee ID *
+                        </label>
+                        <input 
+                            type="text" 
+                            id="employee_id" 
+                            name="employee_id" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                            placeholder="e.g., EMP001"
+                            required
+                        >
+                        <p class="mt-1 text-sm text-gray-500">Unique identifier for this employee within your business</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">
+                                First Name *
+                            </label>
+                            <input 
+                                type="text" 
+                                id="first_name" 
+                                name="first_name" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                                required
+                            >
+                        </div>
+
+                        <div>
+                            <label for="last_name" class="block text-sm font-medium text-gray-700 mb-1">
+                                Last Name *
+                            </label>
+                            <input 
+                                type="text" 
+                                id="last_name" 
+                                name="last_name" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+                            Email Address *
+                        </label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                            required
+                        >
+                    </div>
+
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">
+                            Phone Number
+                        </label>
+                        <input 
+                            type="tel" 
+                            id="phone" 
+                            name="phone" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                            placeholder="e.g., +1 (555) 123-4567"
+                        >
+                    </div>
+                </div>
+
+                <!-- Employment Information -->
+                <div class="space-y-6">
+                    <h2 class="text-xl font-semibold text-gray-800 border-b border-gray-200 pb-2">Employment Information</h2>
+                    
+                    <div>
+                        <label for="job_title" class="block text-sm font-medium text-gray-700 mb-1">
+                            Job Title *
+                        </label>
+                        <input 
+                            type="text" 
+                            id="job_title" 
+                            name="job_title" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                            placeholder="e.g., Software Developer, Accountant"
+                            required
+                        >
+                    </div>
+
+                    <div>
+                        <label for="basic_salary" class="block text-sm font-medium text-gray-700 mb-1">
+                            Basic Salary *
+                        </label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-2 text-gray-500">$</span>
+                            <input 
+                                type="number" 
+                                id="basic_salary" 
+                                name="basic_salary" 
+                                step="0.01" 
+                                min="0"
+                                class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                                placeholder="0.00"
+                                required
+                            >
+                        </div>
+                        <p class="mt-1 text-sm text-gray-500">Annual salary amount</p>
+                    </div>
+
+                    <div>
+                        <label for="date_of_hire" class="block text-sm font-medium text-gray-700 mb-1">
+                            Date of Hire *
+                        </label>
+                        <input 
+                            type="date" 
+                            id="date_of_hire" 
+                            name="date_of_hire" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                            required
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="pt-6 border-t border-gray-200">
+                <div class="flex justify-end space-x-4">
+                    <a href="{% url 'accounts_easy:employee_list' %}" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-md transition duration-300">
+                        Cancel
+                    </a>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition duration-300">
+                        Add Employee
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Helper Information -->
+    <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-blue-800">Employee Management Tips</h3>
+                <div class="mt-2 text-sm text-blue-700">
+                    <ul class="list-disc list-inside space-y-1">
+                        <li>Employee IDs must be unique within your business</li>
+                        <li>Salary information will be used for payroll calculations</li>
+                        <li>Employee records can be updated after creation</li>
+                        <li>All required fields (*) must be completed</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

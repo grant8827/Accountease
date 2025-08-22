@@ -1,0 +1,314 @@
+{% extends 'base.html' %}
+
+{% block title %}Payroll Reports - {{ business.name }} - Accounts Easy{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">Payroll Reports</h1>
+        <p class="text-gray-600 mt-2">Generate and view payroll reports for {{ business.name }}</p>
+    </div>
+
+    <!-- Report Generation -->
+    <div class="bg-white shadow rounded-lg mb-8">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-800">Generate New Report</h2>
+            <p class="text-sm text-gray-600 mt-1">Create various types of payroll reports</p>
+        </div>
+        <div class="p-6">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="report_type" class="block text-sm font-medium text-gray-700 mb-2">
+                            Report Type *
+                        </label>
+                        <select 
+                            id="report_type" 
+                            name="report_type"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                            required
+                        >
+                            <option value="">Select report type</option>
+                            <option value="ytd_summary">YTD Summary Report</option>
+                            <option value="payroll_summary">Payroll Summary</option>
+                            <option value="tax_report">Tax Report</option>
+                            <option value="employee_summary">Employee Summary</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="start_date" class="block text-sm font-medium text-gray-700 mb-2">
+                            Start Date
+                        </label>
+                        <input 
+                            type="date" 
+                            id="start_date" 
+                            name="start_date"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        >
+                    </div>
+
+                    <div>
+                        <label for="end_date" class="block text-sm font-medium text-gray-700 mb-2">
+                            End Date
+                        </label>
+                        <input 
+                            type="date" 
+                            id="end_date" 
+                            name="end_date"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        >
+                    </div>
+                </div>
+
+                <div class="flex justify-end">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition duration-300">
+                        📊 Generate Report
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Report Types Information -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+        <h3 class="text-lg font-medium text-blue-900 mb-4">Available Report Types</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <h4 class="font-medium text-blue-800 mb-2">📈 YTD Summary Report</h4>
+                <p class="text-sm text-blue-700">Year-to-date summary of all employee earnings, deductions, and net pay. Includes totals and individual employee breakdowns.</p>
+            </div>
+            <div>
+                <h4 class="font-medium text-blue-800 mb-2">💼 Payroll Summary</h4>
+                <p class="text-sm text-blue-700">Summary of payroll runs for a specific period, including gross pay, deductions, and net pay totals.</p>
+            </div>
+            <div>
+                <h4 class="font-medium text-blue-800 mb-2">🏛️ Tax Report</h4>
+                <p class="text-sm text-blue-700">Comprehensive tax report showing PAYE, NIS, NHT, HEART, and Education Tax deductions for compliance purposes.</p>
+            </div>
+            <div>
+                <h4 class="font-medium text-blue-800 mb-2">👥 Employee Summary</h4>
+                <p class="text-sm text-blue-700">Detailed employee information including salary details, deductions, and employment status.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Reports -->
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-800">Recent Reports</h2>
+            <p class="text-sm text-gray-600 mt-1">Your recently generated payroll reports</p>
+        </div>
+        
+        <div class="overflow-x-auto">
+            {% if reports %}
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Report Type</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Period</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Generated</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Generated By</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Summary</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for report in reports %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0">
+                                            {% if report.report_type == 'ytd_summary' %}
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">📈 YTD Summary</span>
+                                            {% elif report.report_type == 'payroll_summary' %}
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">💼 Payroll Summary</span>
+                                            {% elif report.report_type == 'tax_report' %}
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">🏛️ Tax Report</span>
+                                            {% else %}
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">👥 {{ report.get_report_type_display }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {{ report.report_period_start|date:"M d, Y" }} - {{ report.report_period_end|date:"M d, Y" }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ report.generated_at|date:"M d, Y g:i A" }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {{ report.generated_by.get_full_name|default:report.generated_by.username }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {% if report.report_data.total_employees %}
+                                        {{ report.report_data.total_employees }} employees
+                                        {% if report.report_data.total_gross_pay %}
+                                            | ${{ report.report_data.total_gross_pay|floatformat:2 }} gross
+                                        {% endif %}
+                                    {% else %}
+                                        Data available
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button onclick="viewReportData({{ report.id }}, '{{ report.get_report_type_display }}')" 
+                                            class="text-blue-600 hover:text-blue-900 mr-3">View Data</button>
+                                    <button onclick="downloadReport({{ report.id }})" 
+                                            class="text-green-600 hover:text-green-900">Download</button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="text-center py-12">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">No reports generated yet</h3>
+                    <p class="mt-1 text-sm text-gray-500">Generate your first payroll report using the form above.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="bg-white p-6 rounded-lg shadow border hover:shadow-md transition duration-300">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-medium text-gray-900">
+                        <a href="{% url 'accounts_easy:employee_management' %}" class="hover:text-blue-600">Employees</a>
+                    </h3>
+                    <p class="text-sm text-gray-500">Manage employee records</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow border hover:shadow-md transition duration-300">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-medium text-gray-900">
+                        <a href="{% url 'accounts_easy:employee_ytd' %}" class="hover:text-green-600">YTD Tracking</a>
+                    </h3>
+                    <p class="text-sm text-gray-500">Year-to-date records</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow border hover:shadow-md transition duration-300">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-medium text-gray-900">
+                        <a href="{% url 'accounts_easy:payroll_setup' %}" class="hover:text-purple-600">Payroll Setup</a>
+                    </h3>
+                    <p class="text-sm text-gray-500">Configure payroll settings</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow border hover:shadow-md transition duration-300">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <svg class="h-8 w-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-medium text-gray-900">
+                        <a href="{% url 'accounts_easy:tax_setup' %}" class="hover:text-indigo-600">Tax Setup</a>
+                    </h3>
+                    <p class="text-sm text-gray-500">Configure tax rates</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Report Data Modal -->
+<div id="reportModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium text-gray-900" id="modalTitle">Report Data</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div id="modalContent" class="mt-2 text-sm text-gray-500 max-h-96 overflow-y-auto">
+                <!-- Report data will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function viewReportData(reportId, reportType) {
+    document.getElementById('modalTitle').textContent = reportType + ' - Data';
+    document.getElementById('modalContent').innerHTML = '<p class="text-center">Loading report data...</p>';
+    document.getElementById('reportModal').classList.remove('hidden');
+    
+    // In a real implementation, you would fetch the report data via AJAX
+    // For now, we'll show a placeholder
+    setTimeout(() => {
+        document.getElementById('modalContent').innerHTML = `
+            <div class="space-y-4">
+                <div class="bg-gray-50 p-4 rounded">
+                    <h4 class="font-medium text-gray-900">Report Summary</h4>
+                    <p class="text-sm text-gray-600 mt-1">Detailed report data would be displayed here. This would include charts, tables, and detailed breakdowns based on the report type.</p>
+                </div>
+                <div class="text-center">
+                    <button onclick="downloadReport(${reportId})" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm">
+                        Download Full Report
+                    </button>
+                </div>
+            </div>
+        `;
+    }, 1000);
+}
+
+function downloadReport(reportId) {
+    // In a real implementation, this would trigger a download
+    alert('Report download would start here. Report ID: ' + reportId);
+}
+
+function closeModal() {
+    document.getElementById('reportModal').classList.add('hidden');
+}
+
+// Close modal when clicking outside
+document.getElementById('reportModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeModal();
+    }
+});
+
+// Set default dates for report generation
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date();
+    const startOfYear = new Date(today.getFullYear(), 0, 1);
+    
+    document.getElementById('start_date').value = startOfYear.toISOString().split('T')[0];
+    document.getElementById('end_date').value = today.toISOString().split('T')[0];
+});
+</script>
+{% endblock %}

@@ -1,0 +1,309 @@
+{% extends 'base.html' %}
+
+{% block title %}Payroll Setup - {{ business.name }} - Accounts Easy{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">Payroll Configuration</h1>
+        <p class="text-gray-600 mt-2">Configure payroll settings for {{ business.name }}</p>
+    </div>
+
+    {% if created %}
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-blue-800">Welcome to Payroll Setup!</h3>
+                    <div class="mt-2 text-sm text-blue-700">
+                        <p>This is your first time setting up payroll. Please configure the settings below to match your business requirements.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <form method="post" class="space-y-8">
+        {% csrf_token %}
+        
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-800">Basic Payroll Settings</h2>
+                <p class="text-sm text-gray-600 mt-1">Configure your payroll frequency and basic settings</p>
+            </div>
+            <div class="p-6 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="payroll_frequency" class="block text-sm font-medium text-gray-700 mb-2">
+                            Payroll Frequency *
+                        </label>
+                        <select id="payroll_frequency" name="payroll_frequency" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <option value="weekly" {% if payroll_config.payroll_frequency == 'weekly' %}selected{% endif %}>Weekly</option>
+                            <option value="bi_weekly" {% if payroll_config.payroll_frequency == 'bi_weekly' %}selected{% endif %}>Bi-Weekly</option>
+                            <option value="monthly" {% if payroll_config.payroll_frequency == 'monthly' %}selected{% endif %}>Monthly</option>
+                            <option value="semi_monthly" {% if payroll_config.payroll_frequency == 'semi_monthly' %}selected{% endif %}>Semi-Monthly</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="standard_hours_per_week" class="block text-sm font-medium text-gray-700 mb-2">
+                            Standard Hours per Week *
+                        </label>
+                        <input 
+                            type="number" 
+                            id="standard_hours_per_week" 
+                            name="standard_hours_per_week" 
+                            value="{{ payroll_config.standard_hours_per_week }}"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                            min="1" max="80"
+                            required
+                        >
+                    </div>
+
+                    <div>
+                        <label for="overtime_rate_multiplier" class="block text-sm font-medium text-gray-700 mb-2">
+                            Overtime Rate Multiplier *
+                        </label>
+                        <input 
+                            type="number" 
+                            id="overtime_rate_multiplier" 
+                            name="overtime_rate_multiplier" 
+                            value="{{ payroll_config.overtime_rate_multiplier }}"
+                            step="0.1" 
+                            min="1" 
+                            max="3"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                            required
+                        >
+                        <p class="mt-1 text-sm text-gray-500">e.g., 1.5 for time and a half</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-800">Tax Configuration</h2>
+                <p class="text-sm text-gray-600 mt-1">Set up tax rates and thresholds for your payroll</p>
+            </div>
+            <div class="p-6 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="paye_rate" class="block text-sm font-medium text-gray-700 mb-2">
+                            PAYE Tax Rate *
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="number" 
+                                id="paye_rate" 
+                                name="paye_rate" 
+                                value="{{ payroll_config.paye_rate }}"
+                                step="0.0001" 
+                                min="0" 
+                                max="1"
+                                class="w-full px-3 py-2 pr-8 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                                required
+                            >
+                            <span class="absolute right-3 top-2 text-gray-500">%</span>
+                        </div>
+                        <p class="mt-1 text-sm text-gray-500">e.g., 0.25 for 25%</p>
+                    </div>
+
+                    <div>
+                        <label for="nis_rate" class="block text-sm font-medium text-gray-700 mb-2">
+                            NIS Rate *
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="number" 
+                                id="nis_rate" 
+                                name="nis_rate" 
+                                value="{{ payroll_config.nis_rate }}"
+                                step="0.0001" 
+                                min="0" 
+                                max="1"
+                                class="w-full px-3 py-2 pr-8 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                                required
+                            >
+                            <span class="absolute right-3 top-2 text-gray-500">%</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="nht_rate" class="block text-sm font-medium text-gray-700 mb-2">
+                            NHT Rate *
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="number" 
+                                id="nht_rate" 
+                                name="nht_rate" 
+                                value="{{ payroll_config.nht_rate }}"
+                                step="0.0001" 
+                                min="0" 
+                                max="1"
+                                class="w-full px-3 py-2 pr-8 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                                required
+                            >
+                            <span class="absolute right-3 top-2 text-gray-500">%</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="heart_rate" class="block text-sm font-medium text-gray-700 mb-2">
+                            HEART Rate *
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="number" 
+                                id="heart_rate" 
+                                name="heart_rate" 
+                                value="{{ payroll_config.heart_rate }}"
+                                step="0.0001" 
+                                min="0" 
+                                max="1"
+                                class="w-full px-3 py-2 pr-8 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                                required
+                            >
+                            <span class="absolute right-3 top-2 text-gray-500">%</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="ed_rate" class="block text-sm font-medium text-gray-700 mb-2">
+                            Education Tax Rate *
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="number" 
+                                id="ed_rate" 
+                                name="ed_rate" 
+                                value="{{ payroll_config.ed_rate }}"
+                                step="0.0001" 
+                                min="0" 
+                                max="1"
+                                class="w-full px-3 py-2 pr-8 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                                required
+                            >
+                            <span class="absolute right-3 top-2 text-gray-500">%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="paye_threshold" class="block text-sm font-medium text-gray-700 mb-2">
+                            Annual PAYE Threshold *
+                        </label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-2 text-gray-500">$</span>
+                            <input 
+                                type="number" 
+                                id="paye_threshold" 
+                                name="paye_threshold" 
+                                value="{{ payroll_config.paye_threshold }}"
+                                class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="nis_ceiling" class="block text-sm font-medium text-gray-700 mb-2">
+                            Annual NIS Ceiling *
+                        </label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-2 text-gray-500">$</span>
+                            <input 
+                                type="number" 
+                                id="nis_ceiling" 
+                                name="nis_ceiling" 
+                                value="{{ payroll_config.nis_ceiling }}"
+                                class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                                required
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-800">Company Registration Numbers</h2>
+                <p class="text-sm text-gray-600 mt-1">Enter your company's tax registration numbers</p>
+            </div>
+            <div class="p-6 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="company_nis_number" class="block text-sm font-medium text-gray-700 mb-2">
+                            Company NIS Number
+                        </label>
+                        <input 
+                            type="text" 
+                            id="company_nis_number" 
+                            name="company_nis_number" 
+                            value="{{ payroll_config.company_nis_number }}"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                            placeholder="e.g., 123456789"
+                        >
+                    </div>
+
+                    <div>
+                        <label for="company_paye_number" class="block text-sm font-medium text-gray-700 mb-2">
+                            Company PAYE Number
+                        </label>
+                        <input 
+                            type="text" 
+                            id="company_paye_number" 
+                            name="company_paye_number" 
+                            value="{{ payroll_config.company_paye_number }}"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                            placeholder="e.g., 987654321"
+                        >
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end space-x-4">
+            <a href="{% url 'accounts_easy:dashboard' %}" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-md transition duration-300">
+                Back to Dashboard
+            </a>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md transition duration-300">
+                Save Payroll Configuration
+            </button>
+        </div>
+    </form>
+
+    <!-- Quick Setup Tips -->
+    <div class="mt-8 bg-gray-50 border border-gray-200 rounded-lg p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Quick Setup Tips</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <h4 class="font-medium text-gray-800 mb-2">Tax Rates (Jamaica)</h4>
+                <ul class="text-sm text-gray-600 space-y-1">
+                    <li>• PAYE: 25% (above threshold)</li>
+                    <li>• NIS: 3% (up to ceiling)</li>
+                    <li>• NHT: 2%</li>
+                    <li>• HEART: 3%</li>
+                    <li>• Education Tax: 2.25%</li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-medium text-gray-800 mb-2">Common Settings</h4>
+                <ul class="text-sm text-gray-600 space-y-1">
+                    <li>• Standard Hours: 40 hours/week</li>
+                    <li>• Overtime Rate: 1.5x regular rate</li>
+                    <li>• Monthly payroll is most common</li>
+                    <li>• Keep registration numbers handy</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

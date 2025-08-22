@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Approve Business - Accounts Easy{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">Approve Business Registration</h1>
+        <p class="text-gray-600 mt-2">Review and approve business registration for {{ business.name }}</p>
+    </div>
+
+    <div class="bg-white shadow rounded-lg p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Business Information</h2>
+                <dl class="space-y-4">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Business Name</dt>
+                        <dd class="text-lg text-gray-900 font-medium">{{ business.name }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Registration Number</dt>
+                        <dd class="text-sm text-gray-900">{{ business.registration_number|default:"Not provided" }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Email</dt>
+                        <dd class="text-sm text-gray-900">{{ business.email }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Phone</dt>
+                        <dd class="text-sm text-gray-900">{{ business.phone|default:"Not provided" }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Tax ID</dt>
+                        <dd class="text-sm text-gray-900">{{ business.tax_id|default:"Not provided" }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Address</dt>
+                        <dd class="text-sm text-gray-900">{{ business.address }}</dd>
+                    </div>
+                </dl>
+            </div>
+
+            <div>
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Owner Information</h2>
+                <dl class="space-y-4">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Owner Name</dt>
+                        <dd class="text-lg text-gray-900 font-medium">{{ business.owner.get_full_name|default:business.owner.username }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Username</dt>
+                        <dd class="text-sm text-gray-900">{{ business.owner.username }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Email</dt>
+                        <dd class="text-sm text-gray-900">{{ business.owner.email }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Date Joined</dt>
+                        <dd class="text-sm text-gray-900">{{ business.owner.date_joined|date:"F d, Y" }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Registration Submitted</dt>
+                        <dd class="text-sm text-gray-900">{{ business.created_at|date:"F d, Y g:i A" }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Current Status</dt>
+                        <dd class="text-sm">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                {{ business.get_status_display }}
+                            </span>
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-gray-200">
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-green-800">Approve Business Registration</h3>
+                        <div class="mt-2 text-sm text-green-700">
+                            <p>By approving this business registration, you are granting the owner access to the full payroll management system including:</p>
+                            <ul class="list-disc list-inside mt-2 space-y-1">
+                                <li>Employee management and onboarding</li>
+                                <li>Payroll processing and calculations</li>
+                                <li>Deduction and tax management</li>
+                                <li>Reporting and analytics</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form method="post" class="flex space-x-4">
+                {% csrf_token %}
+                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition duration-300 flex items-center">
+                    <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Approve Business
+                </button>
+                <a href="{% url 'accounts_easy:admin_dashboard' %}" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-medium transition duration-300 flex items-center">
+                    <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    Back to Dashboard
+                </a>
+                <a href="{% url 'accounts_easy:reject_business' business.id %}" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition duration-300 flex items-center">
+                    <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Reject Instead
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

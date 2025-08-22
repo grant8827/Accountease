@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Employees - {{ business.name }} - Accounts Easy{% endblock %}
+
+{% block content %}
+<div class="bg-white p-8 rounded-lg shadow-lg">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">{{ business.name }} - Employee List</h1>
+        <div class="flex space-x-4">
+            <a href="{% url 'accounts_easy:add_employee' %}" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition duration-300">
+                Add Employee
+            </a>
+            <a href="{% url 'accounts_easy:dashboard' %}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition duration-300">
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    {% if employees %}
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+            <thead>
+                <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                    <th class="py-3 px-6 text-left">Employee ID</th>
+                    <th class="py-3 px-6 text-left">Name</th>
+                    <th class="py-3 px-6 text-left">Job Title</th>
+                    <th class="py-3 px-6 text-left">Basic Salary</th>
+                    <th class="py-3 px-6 text-left">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="text-gray-700 text-sm font-light">
+                {% for employee in employees %}
+                <tr class="border-b border-gray-200 hover:bg-gray-50">
+                    <td class="py-3 px-6 text-left whitespace-nowrap">{{ employee.employee_id }}</td>
+                    <td class="py-3 px-6 text-left">{{ employee.first_name }} {{ employee.last_name }}</td>
+                    <td class="py-3 px-6 text-left">{{ employee.job_title|default:"N/A" }}</td>
+                    <td class="py-3 px-6 text-left">${{ employee.basic_salary }}</td>
+                    <td class="py-3 px-6 text-left">
+                        <a href="{% url 'accounts_easy:employee_detail' employee.pk %}" class="text-blue-500 hover:text-blue-700 font-medium rounded-md px-3 py-1 transition duration-300 hover:bg-blue-100">View Details</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-12">
+        <div class="text-gray-500 text-xl mb-4">No employees found</div>
+        <p class="text-gray-400 mb-6">You haven't added any employees to {{ business.name }} yet.</p>
+        <a href="/admin/accounts_easy/employee/add/" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-md transition duration-300" target="_blank">
+            Add First Employee
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

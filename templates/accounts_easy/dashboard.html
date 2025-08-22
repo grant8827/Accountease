@@ -1,0 +1,273 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - {% if business %}{{ business.name }}{% else %}Accounts Easy{% endif %}{% endblock %}
+
+{% block content %}
+<div class="bg-white p-8 rounded-lg shadow-lg">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">{% if business %}{{ business.name }}{% else %}Business{% endif %} Dashboard</h1>
+        <div class="flex space-x-4">
+            <a href="{% url 'accounts_easy:business_settings' %}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition duration-300">
+                Business Settings
+            </a>
+            <form method="post" action="{% url 'logout' %}" class="inline">
+                {% csrf_token %}
+                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition duration-300">
+                    Logout
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Business Overview Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-blue-100 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold text-blue-800">Total Employees</h3>
+            <p class="text-3xl font-bold text-blue-900">{{ total_employees|default:"0" }}</p>
+        </div>
+        <div class="bg-green-100 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold text-green-800">Payroll Runs</h3>
+            <p class="text-3xl font-bold text-green-900">{{ total_payroll_runs|default:"0" }}</p>
+        </div>
+        <div class="bg-yellow-100 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold text-yellow-800">Business Owner</h3>
+            <p class="text-lg font-medium text-yellow-900">
+                {% if business and business.owner %}
+                    {{ business.owner.get_full_name|default:business.owner.username }}
+                {% else %}
+                    Not set
+                {% endif %}
+            </p>
+        </div>
+        <div class="bg-purple-100 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold text-purple-800">Registration</h3>
+            <p class="text-lg font-medium text-purple-900">
+                {% if business %}
+                    {{ business.registration_number|default:"Not set" }}
+                {% else %}
+                    Not set
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <a href="{% url 'accounts_easy:business_info' %}" class="bg-indigo-500 hover:bg-indigo-600 text-white p-6 rounded-lg text-center transition duration-300">
+            <h3 class="text-xl font-semibold mb-2">Business Info</h3>
+            <p>View complete business details</p>
+        </a>
+        <a href="{% url 'accounts_easy:employee_management' %}" class="bg-blue-500 hover:bg-blue-600 text-white p-6 rounded-lg text-center transition duration-300">
+            <h3 class="text-xl font-semibold mb-2">Manage Employees</h3>
+            <p>Complete employee management system</p>
+        </a>
+        <a href="{% url 'accounts_easy:add_transaction' %}" class="bg-yellow-500 hover:bg-yellow-600 text-white p-6 rounded-lg text-center transition duration-300">
+            <h3 class="text-xl font-semibold mb-2">Add Transaction</h3>
+            <p>Record income or expenditure</p>
+        </a>
+        <a href="{% url 'accounts_easy:view_transactions' %}" class="bg-green-500 hover:bg-green-600 text-white p-6 rounded-lg text-center transition duration-300">
+            <h3 class="text-xl font-semibold mb-2">View Transactions</h3>
+            <p>See all income and expenditure</p>
+        </a>
+    </div>
+
+    <!-- Additional Quick Actions -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <a href="{% url 'accounts_easy:bonus_management' %}" class="bg-emerald-500 hover:bg-emerald-600 text-white p-6 rounded-lg text-center transition duration-300">
+            <h3 class="text-xl font-semibold mb-2">Bonus Management</h3>
+            <p>Manage employee bonuses and incentives</p>
+        </a>
+        <a href="{% url 'accounts_easy:payroll_setup' %}" class="bg-cyan-500 hover:bg-cyan-600 text-white p-6 rounded-lg text-center transition duration-300">
+            <h3 class="text-xl font-semibold mb-2">Payroll Setup</h3>
+            <p>Configure payroll and tax settings</p>
+        </a>
+        <a href="{% url 'accounts_easy:payroll_reports' %}" class="bg-purple-500 hover:bg-purple-600 text-white p-6 rounded-lg text-center transition duration-300">
+            <h3 class="text-xl font-semibold mb-2">Reports</h3>
+            <p>Generate payroll and YTD reports</p>
+        </a>
+        <a href="{% url 'accounts_easy:payroll_run_list' %}" class="bg-teal-500 hover:bg-teal-600 text-white p-6 rounded-lg text-center transition duration-300">
+            <h3 class="text-xl font-semibold mb-2">Payroll History</h3>
+            <p>View past payroll runs</p>
+        </a>
+    </div>
+
+    <!-- Third Row of Actions -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <a href="{% url 'accounts_easy:employee_ytd' %}" class="bg-rose-500 hover:bg-rose-600 text-white p-6 rounded-lg text-center transition duration-300">
+            <h3 class="text-xl font-semibold mb-2">YTD Tracking</h3>
+            <p>Year-to-date employee records</p>
+        </a>
+        <!-- Add more actions here as needed -->
+    </div>
+
+    <!-- Self-Service Features Overview -->
+    <div class="bg-gray-50 p-6 rounded-lg mb-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">🎯 Complete Self-Service Payroll Management</h2>
+        <p class="text-gray-600 mb-6">As an approved business, you have full control over your payroll operations:</p>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Employee Management -->
+            <div class="bg-white p-4 rounded-lg shadow border">
+                <div class="flex items-center mb-3">
+                    <svg class="h-6 w-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                    <h3 class="text-lg font-semibold text-gray-800">Employee Management</h3>
+                </div>
+                <ul class="text-sm text-gray-600 space-y-1">
+                    <li>• Add and manage employees</li>
+                    <li>• Set salaries and positions</li>
+                    <li>• Track employee status</li>
+                    <li>• Assign custom deductions</li>
+                </ul>
+                <a href="{% url 'accounts_easy:employee_management' %}" class="text-blue-600 hover:text-blue-800 text-sm font-medium mt-2 inline-block">
+                    Manage Employees →
+                </a>
+            </div>
+
+            <!-- Payroll Configuration -->
+            <div class="bg-white p-4 rounded-lg shadow border">
+                <div class="flex items-center mb-3">
+                    <svg class="h-6 w-6 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <h3 class="text-lg font-semibold text-gray-800">Payroll Setup</h3>
+                </div>
+                <ul class="text-sm text-gray-600 space-y-1">
+                    <li>• Pay frequency configuration</li>
+                    <li>• Jamaica tax rates (PAYE, NIS, NHT)</li>
+                    <li>• Overtime and standard hours</li>
+                    <li>• Company registration numbers</li>
+                </ul>
+                <a href="{% url 'accounts_easy:payroll_setup' %}" class="text-green-600 hover:text-green-800 text-sm font-medium mt-2 inline-block">
+                    Configure Payroll →
+                </a>
+            </div>
+
+            <!-- YTD Tracking -->
+            <div class="bg-white p-4 rounded-lg shadow border">
+                <div class="flex items-center mb-3">
+                    <svg class="h-6 w-6 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    <h3 class="text-lg font-semibold text-gray-800">YTD & Reports</h3>
+                </div>
+                <ul class="text-sm text-gray-600 space-y-1">
+                    <li>• Year-to-date tracking</li>
+                    <li>• Comprehensive reports</li>
+                    <li>• Tax compliance reports</li>
+                    <li>• Employee summaries</li>
+                </ul>
+                <a href="{% url 'accounts_easy:employee_ytd' %}" class="text-purple-600 hover:text-purple-800 text-sm font-medium mt-2 inline-block">
+                    View YTD Records →
+                </a>
+            </div>
+
+            <!-- Bonus Management -->
+            <div class="bg-white p-4 rounded-lg shadow border">
+                <div class="flex items-center mb-3">
+                    <svg class="h-6 w-6 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                    </svg>
+                    <h3 class="text-lg font-semibold text-gray-800">Bonus Management</h3>
+                </div>
+                <ul class="text-sm text-gray-600 space-y-1">
+                    <li>• Monthly employee bonuses</li>
+                    <li>• Performance incentives</li>
+                    <li>• Holiday and special bonuses</li>
+                    <li>• Automatic payroll integration</li>
+                </ul>
+                <a href="{% url 'accounts_easy:bonus_management' %}" class="text-yellow-600 hover:text-yellow-800 text-sm font-medium mt-2 inline-block">
+                    Manage Bonuses →
+                </a>
+            </div>
+
+            <!-- Payslip Management -->
+            <div class="bg-white p-4 rounded-lg shadow border">
+                <div class="flex items-center mb-3">
+                    <svg class="h-6 w-6 text-teal-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <h3 class="text-lg font-semibold text-gray-800">Payslip Generation</h3>
+                </div>
+                <ul class="text-sm text-gray-600 space-y-1">
+                    <li>• Professional payslip printing</li>
+                    <li>• Automatic tax calculations</li>
+                    <li>• Bonus integration</li>
+                    <li>• PDF-ready format</li>
+                </ul>
+                <a href="{% url 'accounts_easy:payroll_staff_selection' %}" class="text-teal-600 hover:text-teal-800 text-sm font-medium mt-2 inline-block">
+                    Create Payroll Run →
+                </a>
+            </div>
+
+            <!-- Deduction Management -->
+            <div class="bg-white p-4 rounded-lg shadow border">
+                <div class="flex items-center mb-3">
+                    <svg class="h-6 w-6 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                    </svg>
+                    <h3 class="text-lg font-semibold text-gray-800">Deduction Types</h3>
+                </div>
+                <ul class="text-sm text-gray-600 space-y-1">
+                    <li>• Custom deduction types</li>
+                    <li>• Percentage or fixed amounts</li>
+                    <li>• Employee-specific deductions</li>
+                    <li>• Automatic application</li>
+                </ul>
+                <a href="{% url 'accounts_easy:deduction_setup' %}" class="text-red-600 hover:text-red-800 text-sm font-medium mt-2 inline-block">
+                    Setup Deductions →
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Recent Payroll Runs -->
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Recent Payroll Runs</h2>
+            {% if recent_payroll_runs %}
+                <div class="bg-gray-50 rounded-lg p-4">
+                    {% for payroll_run in recent_payroll_runs %}
+                        <div class="border-b border-gray-200 py-3 {% if forloop.last %}border-b-0{% endif %}">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="font-medium">{{ payroll_run.start_date }} to {{ payroll_run.end_date }}</p>
+                                    <p class="text-sm text-gray-600">Status: {{ payroll_run.get_status_display }}</p>
+                                </div>
+                                <span class="text-sm text-gray-500">{{ payroll_run.created_at|date:"M d, Y" }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-gray-600">No payroll runs yet.</p>
+            {% endif %}
+        </div>
+
+        <!-- Recent Employees -->
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Recent Employees</h2>
+            {% if recent_employees %}
+                <div class="bg-gray-50 rounded-lg p-4">
+                    {% for employee in recent_employees %}
+                        <div class="border-b border-gray-200 py-3 {% if forloop.last %}border-b-0{% endif %}">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="font-medium">{% if employee.first_name %}{{ employee.first_name }} {{ employee.last_name }}{% else %}{{ employee.id }}{% endif %}</p>
+                                    <p class="text-sm text-gray-600">{{ employee.job_title|default:"Employee" }}</p>
+                                </div>
+                                <span class="text-sm text-gray-500">{{ employee.created_at|date:"M d, Y" }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-gray-600">No employees yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

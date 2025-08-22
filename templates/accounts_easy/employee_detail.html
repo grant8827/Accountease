@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ employee.first_name }} {{ employee.last_name }} - Accounts Easy{% endblock %}
+
+{% block content %}
+<div class="bg-white p-8 rounded-lg shadow-lg">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Employee Details: {{ employee.first_name }} {{ employee.last_name }}</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div>
+            <p class="text-gray-600"><strong class="text-gray-800">Employee ID:</strong> {{ employee.employee_id }}</p>
+            <p class="text-gray-600"><strong class="text-gray-800">Job Title:</strong> {{ employee.job_title|default:"N/A" }}</p>
+            <p class="text-gray-600"><strong class="text-gray-800">Date of Hire:</strong> {{ employee.date_of_hire }}</p>
+            <p class="text-gray-600"><strong class="text-gray-800">Basic Salary:</strong> ${{ employee.basic_salary }}</p>
+        </div>
+    </div>
+
+    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Deductions</h2>
+    {% if employee_deductions %}
+    <div class="overflow-x-auto mb-8">
+        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+            <thead>
+                <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                    <th class="py-3 px-6 text-left">Deduction Type</th>
+                    <th class="py-3 px-6 text-left">Amount/Percentage</th>
+                    <th class="py-3 px-6 text-left">Effective Date</th>
+                    <th class="py-3 px-6 text-left">End Date</th>
+                </tr>
+            </thead>
+            <tbody class="text-gray-700 text-sm font-light">
+                {% for ded in employee_deductions %}
+                <tr class="border-b border-gray-200 hover:bg-gray-50">
+                    <td class="py-3 px-6 text-left">{{ ded.deduction_type.name }}</td>
+                    <td class="py-3 px-6 text-left">
+                        {% if ded.deduction_type.is_percentage %}{{ ded.amount }}%{% else %}${{ ded.amount }}{% endif %}
+                    </td>
+                    <td class="py-3 px-6 text-left">{{ ded.effective_date }}</td>
+                    <td class="py-3 px-6 text-left">{{ ded.end_date|default:"N/A" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-gray-600 mb-8">No deductions set up for this employee.</p>
+    {% endif %}
+
+    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Payslips</h2>
+    {% if payslips %}
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+            <thead>
+                <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                    <th class="py-3 px-6 text-left">Payroll Period</th>
+                    <th class="py-3 px-6 text-left">Gross Pay</th>
+                    <th class="py-3 px-6 text-left">Total Deductions</th>
+                    <th class="py-3 px-6 text-left">Net Pay</th>
+                    <th class="py-3 px-6 text-left">Generated Date</th>
+                </tr>
+            </thead>
+            <tbody class="text-gray-700 text-sm font-light">
+                {% for payslip in payslips %}
+                <tr class="border-b border-gray-200 hover:bg-gray-50">
+                    <td class="py-3 px-6 text-left">{{ payslip.payroll_run.start_date }} - {{ payslip.payroll_run.end_date }}</td>
+                    <td class="py-3 px-6 text-left">${{ payslip.gross_pay }}</td>
+                    <td class="py-3 px-6 text-left">${{ payslip.total_deductions }}</td>
+                    <td class="py-3 px-6 text-left">${{ payslip.net_pay }}</td>
+                    <td class="py-3 px-6 text-left">{{ payslip.generated_date|date:"Y-m-d H:i" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-gray-600">No payslips generated for this employee yet.</p>
+    {% endif %}
+
+    <div class="mt-8">
+        <a href="{% url 'accounts_easy:employee_list' %}" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 shadow-md">Back to Employee List</a>
+    </div>
+</div>
+{% endblock %}
