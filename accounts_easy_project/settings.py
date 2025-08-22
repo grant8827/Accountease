@@ -30,12 +30,15 @@ environ.Env.read_env(BASE_DIR / '.env')
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY', default='django-insecure-^c^t^g*a^m#v1g6s3t@5a^j!b!q!c!x!y!z!0!1!2!3!4!5!6!7!8!9!a!b!c!d!e!f!g!h!i!j!k!l!m!n!o!p!q!r!s!t!u!v!w!x!y!z')
+SECRET_KEY = env('SECRET_KEY', default='^a8l(06*u$&rs=*nbmgqfwwv!h^l-1zz#4hd!(78jb2o+tlgds')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DEBUG')
+DEBUG = env('DEBUG', default=False)
 
 ALLOWED_HOSTS = ['accountease-production.up.railway.app', 'healthcheck.railway.app', 'localhost', '127.0.0.1']
+
+# Determine if we're in production (Railway)
+IS_RAILWAY = env('RAILWAY_ENVIRONMENT', default=None) is not None
 
 
 # Application definition
@@ -161,11 +164,21 @@ CSRF_TRUSTED_ORIGINS = [
     'https://healthcheck.railway.app',
 ]
 
-# Session and Cookie settings
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SECURE_SSL_REDIRECT = False  # Railway handles SSL termination
-SESSION_COOKIE_SECURE = False  # Set to True only if you have HTTPS everywhere
-CSRF_COOKIE_SECURE = False     # Set to True only if you have HTTPS everywhere
+# Environment-specific security settings
+if IS_RAILWAY:
+    # Production security settings for Railway
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = False  # Railway handles SSL termination at load balancer
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+else:
+    # Development settings
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
 
 # Additional security headers
 SECURE_BROWSER_XSS_FILTER = True
